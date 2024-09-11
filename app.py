@@ -1,2 +1,1 @@
-aldapkdmlakdmlaskmdasd
-asçdkmaskdçlmasklçdmlasçdasd
+print('cavalo')
