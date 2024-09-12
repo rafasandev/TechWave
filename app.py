@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-print('cavalo')
-=======
 import sqlite3
 import sys
 
@@ -154,4 +151,3 @@ def retrieve_arquivo(caminho):
 if __name__ == "__main__":
     comando = input("Digite um comando: ")
     analisar_comando(comando)
->>>>>>> e9a2f2dc364a4346e9f09dfae417377457ac508c
