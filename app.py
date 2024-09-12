@@ -28,6 +28,7 @@ PALAVRAS_RESERVADAS = {
 }
 
 def conectar_db():
+    print("Ola")
     return sqlite3.connect('arquivos.db')
 
 def criar_tabela():
