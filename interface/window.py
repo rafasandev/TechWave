@@ -41,7 +41,7 @@ class MainWindow(QMainWindow):
         self.splitter.addWidget(self.graph_view)
         self.splitter.setStyleSheet(
             """
-            background-color: #5C5C5C;
+            background-color: #272E25;
         """
         )
 

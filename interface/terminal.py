@@ -1,6 +1,7 @@
-from PyQt6.QtGui import QTextCursor
+# from PyQt6.QtGui import QTextCursor
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit
-from PyQt6.QtCore import Qt, QEvent
+
+# from PyQt6.QtCore import Qt, QEvent
 
 
 class Terminal(QWidget):
@@ -14,7 +15,7 @@ class Terminal(QWidget):
 
         self.terminal.setStyleSheet(
             """
-            background-color: #272E25; 
+            background-color: #121311; 
             padding: 5px; 
             color: #ffffff;
             border: none;
