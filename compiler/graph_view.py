@@ -7,19 +7,19 @@ class GraphView(QGraphicsView):
         self.scene = GraphScene()  # Certifique-se de que GraphScene é uma subclasse de QGraphicsScene
         self.setScene(self.scene)  # Isso deve funcionar agora
 
-    def add_vertex(self, name, category=None, position=None):
-        self.scene.add_vertex(name, category, position)  # Remover relation
+    def add_vertex(self, name, category=None, custo=None):
+        self.scene.add_vertex(name, category, custo)  # Remover relation
 
-    def delete_edge(self, vertex1, vertex2):
+    def delete_aresta(self, vertex1, vertex2):
         self.scene.delete_edge(vertex1, vertex2)
 
-    def modify_vertex(self, old_id, new_name, new_category=None, position=None):
-        self.scene.modify_vertex(old_id, new_name, new_category, position)
+    def modify_vertice(self, old_id, new_name, new_category=None, custo=None):
+        self.scene.modify_vertex(old_id, new_name, new_category, custo)
 
-    def delete_vertex(self, id):
+    def delete_vertice(self, id):
         self.scene.delete_vertex(id)
 
-    def add_edge(self, id1, id2):
+    def add_aresta(self, id1, id2):
         self.scene.add_edge(id1, id2)
 
     def list_graph(self):
