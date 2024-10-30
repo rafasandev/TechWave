@@ -15,12 +15,12 @@ def process_command(command, graph_view):
             return
         name = tokens[1]
         category = tokens[2] if len(tokens) > 2 else None
-        position = tokens[3] if len(tokens) > 3 else None
-        graph_view.add_vertex(name, category, position)
+        custo = tokens[3] if len(tokens) > 3 else 0
+        graph_view.add_vertex(name, category, custo)
 
     elif cmd == "modify":
         if len(tokens) < 3:
-            print("Erro: Comando incompleto. Use: modify (id) (novo_nome) [nova_categoria] [nova_posição]")
+            print("Erro: Comando incompleto. Use: modify (id) (novo_nome) [nova_categoria] [novo_custo]")
             return
         try:
             old_id = int(tokens[1])  # ID deve ser um inteiro
@@ -29,8 +29,8 @@ def process_command(command, graph_view):
             return
         new_name = tokens[2]
         new_category = tokens[3] if len(tokens) > 3 else None
-        position = tokens[4] if len(tokens) > 4 else None
-        graph_view.modify_vertex(old_id, new_name, new_category, position)
+        custo = tokens[4] if len(tokens) > 4 else None
+        graph_view.modify_vertex(old_id, new_name, new_category, custo)
 
     elif cmd == "delete":
         identifier = tokens[1] if len(tokens) > 1 else None
@@ -39,13 +39,13 @@ def process_command(command, graph_view):
         else:
             print("Erro: Comando incompleto. Use: delete (id/nome)")
 
-    elif cmd == "delete_edge":
+    elif cmd == "delete_aresta":
         if len(tokens) < 3:
-            print("Erro: Comando incompleto. Use: delete_edge (nome1) (nome2)")
+            print("Erro: Comando incompleto. Use: delete_aresta (nome1) (nome2)")
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.delete_edge(vertex1, vertex2)  # Chama delete_edge para excluir a aresta específica
+        graph_view.delete_aresta(vertex1, vertex2)  # Chama delete_aresta para excluir a aresta específica
 
     elif cmd == "connect":
         if len(tokens) != 3:
@@ -53,7 +53,7 @@ def process_command(command, graph_view):
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.add_edge(vertex1, vertex2)  # Chama add_edge com nomes ou IDs
+        graph_view.add_aresta(vertex1, vertex2)  # Chama add_edge com nomes ou IDs
 
     elif cmd == "list":
         graph_view.list_graph()
