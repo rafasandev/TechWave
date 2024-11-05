@@ -2,10 +2,9 @@ import networkx as nx
 from PyQt6.QtWidgets import QGraphicsScene, QGraphicsEllipseItem, QGraphicsLineItem
 from PyQt6.QtGui import QPen, QBrush, QColor
 from PyQt6.QtCore import Qt, QPointF
-import secrets
 import sqlite3
 import matplotlib.pyplot as plt
-
+import os
 
 class Vertice:
     def __init__(self, id, name, category, custo):
@@ -41,6 +40,13 @@ class GraphScene(QGraphicsScene):
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     name1 TEXT NOT NULL,
                     name2 TEXT NOT NULL
+                )
+            ''')
+            self.conn.execute('''
+                CREATE TABLE IF NOT EXISTS arquivos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name_vertice TEXT NOT NULL,
+                    txt BLOB
                 )
             ''')
 
@@ -98,7 +104,7 @@ class GraphScene(QGraphicsScene):
             update_query += ", category = ?"
             parameters.append(new_category)
 
-        if new_position:
+        if new_custo:
             update_query += ", custo = ?"
             parameters.append(new_custo)
 
@@ -117,7 +123,7 @@ class GraphScene(QGraphicsScene):
         print(f"Vértice '{old_name}' modificado com sucesso.")
         cursor.close()
 
-    def delete_edge(self, vertex1, vertex2):
+    def delete_aresta(self, vertex1, vertex2):
         """Remove uma aresta específica entre dois vértices."""
         cursor = self.conn.cursor()
 
@@ -130,8 +136,6 @@ class GraphScene(QGraphicsScene):
         self.arestas = [aresta for aresta in self.arestas if not (aresta[0] == vertex1 and aresta[1] == vertex2) and not (
                     aresta[0] == vertex2 and aresta[1] == vertex1)]
 
-        # Atualiza a cena gráfica para remover a linha associada (se for implementado graficamente)
-        self.update_graphics()
 
         print(f"Aresta entre '{vertex1}' e '{vertex2}' removida.")
         cursor.close()
@@ -155,34 +159,56 @@ class GraphScene(QGraphicsScene):
     def close(self):
         self.conn.close()
 
-    def delete_vertex(self, identifier):
+    def delete_vertice(self, identifier):
         cursor = self.conn.cursor()
+        if identifier == int:
+            # Tenta apagar pelo ID
+            cursor.execute('SELECT * FROM vertices WHERE id = ?', (identifier,))
+            vertice = cursor.fetchone()
 
-        # Tenta apagar pelo ID
-        cursor.execute('SELECT * FROM vertices WHERE id = ?', (identifier,))
-        vertice = cursor.fetchone()
+            if vertice:
+                # Remove o vértice do banco de dados
+                cursor.execute('DELETE FROM vertices WHERE id = ?', (identifier,))
+                self.conn.commit()
+                print(f"Vértice com ID {identifier} removido.")
+            else:
+                # Tenta apagar pelo nome se não encontrar pelo ID
+                cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
+                vertex = cursor.fetchone()
 
-        if vertice:
-            # Remove o vértice do banco de dados
-            cursor.execute('DELETE FROM vertices WHERE id = ?', (identifier,))
-            self.conn.commit()
-            print(f"Vértice com ID {identifier} removido.")
+                if vertice:
+                    # Remove o vértice do banco de dados
+                    cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
+                    self.conn.commit()
+                    print(f"Vértice com nome '{identifier}' removido.")
+                else:
+                    print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
         else:
-            # Tenta apagar pelo nome se não encontrar pelo ID
             cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
-            vertex = cursor.fetchone()
+            vertice = cursor.fetchone()
 
             if vertice:
                 # Remove o vértice do banco de dados
                 cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
                 self.conn.commit()
-                print(f"Vértice com nome '{identifier}' removido.")
+                print(f"Vértice com ID {identifier} removido.")
             else:
-                print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
+                # Tenta apagar pelo nome se não encontrar pelo ID
+                cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
+                vertex = cursor.fetchone()
+
+                if vertice:
+                    # Remove o vértice do banco de dados
+                    cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
+                    self.conn.commit()
+                    print(f"Vértice com nome '{identifier}' removido.")
+                else:
+                    print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
+
 
         cursor.close()
 
-    def add_edge(self, vertex1, vertex2):
+    def add_aresta(self, vertex1, vertex2):
         """Adiciona uma aresta entre dois vértices, verificando se já existe uma conexão entre eles (em ambas as direções)."""
         cursor = self.conn.cursor()
 
@@ -225,3 +251,53 @@ class GraphScene(QGraphicsScene):
 
         print(f"Aresta conectada entre '{vertex1}' e '{vertex2}'.")
         cursor.close()
+
+    def inserir_arquivo_txt(self, name_vertice, caminho_arquivo):
+        """Insere o conteúdo de um arquivo .txt na tabela arquivos associado ao name_vertice."""
+        try:
+            # Abre o arquivo .txt no modo de leitura
+            with open(caminho_arquivo, 'r', encoding='utf-8') as file:  # Use 'r' para leitura de texto
+                arquivo = file.read()  # Lê todo o conteúdo do arquivo
+
+            cursor = self.conn.cursor()
+            cursor.execute('INSERT INTO arquivos (name_vertice, txt) VALUES (?, ?)', (name_vertice, arquivo))
+            self.conn.commit()  # Comita a transação para salvar as alterações
+            print(f"Arquivo '{caminho_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
+            cursor.close()
+        except Exception as e:
+            print(f"Erro ao inserir arquivo .txt: {e}")
+
+
+    def close(self):
+        self.conn.close()
+
+    def view_arquivo_txt(self, identifier):
+        cursor = self.conn.cursor()  # Cria um cursor aqui
+        # Checa se o identifier é um ID numérico ou um nome
+        if isinstance(identifier, int):
+            query = "SELECT txt FROM arquivos WHERE id = ?"
+            cursor.execute(query, (identifier,))
+        else:
+            query = "SELECT txt FROM arquivos WHERE name_vertice = ?"
+            cursor.execute(query, (identifier,))
+        
+        result = cursor.fetchone()
+        cursor.close()  # Fecha o cursor após a execução da consulta
+        if result:
+            return result[0]  # Retorna o conteúdo do arquivo
+        else:
+            print("Arquivo não encontrado.")
+            return None
+        
+    def delete_arquivo(self, nome_vertice):
+        """Remove o registro do arquivo associado ao vértice do banco de dados."""
+        cursor = self.conn.cursor()  # Use o cursor da conexão existente
+        cursor.execute("DELETE txt FROM arquivos WHERE name_vertice=?", (nome_vertice,))
+        self.conn.commit()  # Comita a transação após a exclusão
+
+        if cursor.rowcount > 0:
+            print(f"Arquivo associado ao vértice '{nome_vertice}' excluído com sucesso do banco de dados.")
+            return True
+        else:
+            print(f"Erro: Vértice '{nome_vertice}' não encontrado no banco de dados.")
+            return False

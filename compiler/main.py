@@ -8,6 +8,8 @@ def process_command(command, graph_view):
         return
 
     cmd = tokens[0].lower()
+    cmd_parts = command.split()
+    cmd = cmd_parts[0]
 
     if cmd == "add":
         if len(tokens) < 2:
@@ -18,9 +20,9 @@ def process_command(command, graph_view):
         custo = tokens[3] if len(tokens) > 3 else 0
         graph_view.add_vertex(name, category, custo)
 
-    elif cmd == "modify":
+    elif cmd == "md":
         if len(tokens) < 3:
-            print("Erro: Comando incompleto. Use: modify (id) (novo_nome) [nova_categoria] [novo_custo]")
+            print("Erro: Comando incompleto. Use: md (id) (novo_nome) [nova_categoria] [novo_custo]")
             return
         try:
             old_id = int(tokens[1])  # ID deve ser um inteiro
@@ -32,16 +34,16 @@ def process_command(command, graph_view):
         custo = tokens[4] if len(tokens) > 4 else None
         graph_view.modify_vertex(old_id, new_name, new_category, custo)
 
-    elif cmd == "delete":
+    elif cmd == "del":
         identifier = tokens[1] if len(tokens) > 1 else None
         if identifier:
-            graph_view.delete_vertex(identifier)
+            graph_view.delete_vertice(identifier)
         else:
             print("Erro: Comando incompleto. Use: delete (id/nome)")
 
-    elif cmd == "delete_aresta":
+    elif cmd == "del a":
         if len(tokens) < 3:
-            print("Erro: Comando incompleto. Use: delete_aresta (nome1) (nome2)")
+            print("Erro: Comando incompleto. Use: del_aresta (nome1) (nome2)")
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
@@ -53,23 +55,49 @@ def process_command(command, graph_view):
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.add_aresta(vertex1, vertex2)  # Chama add_edge com nomes ou IDs
+        graph_view.add_aresta(vertex1, vertex2)  
 
     elif cmd == "list":
         graph_view.list_graph()
+    
+    elif cmd == 'cd':
+        if len(tokens) == 3:  # Alterado para tokens
+            name_vertice = tokens[1]  # Alterado para tokens
+            caminho_arquivo = tokens[2]  # Alterado para tokens
+            # Passa os dois argumentos para cd_vertice
+            graph_view.cd_vertice(name_vertice, caminho_arquivo)
+        else:
+            print("Comando 'cd' inválido. Use: cd <nome_vertice> <caminho_arquivo>")
+
+    if cmd == 'view':
+        if len(tokens) == 2:  # Alterado para tokens
+            identifier = tokens[1]  # Alterado para tokens
+            try:
+                # Tenta converter para int para identificar se é um ID
+                identifier = int(identifier)
+            except ValueError:
+                pass  # Se falhar, permanece como string para buscar pelo nome
+            graph_view.view(identifier)
+        else:
+            print("Comando 'view' inválido. Use: view <nome_ou_id>")
+
+    elif cmd == "del_cd":
+        identifier = tokens[1]  # Aqui você quis usar 'tokens', não 'parts'
+        if graph_view.delete_arquivo(identifier):  # Chama a função de exclusão do arquivo
+            print(f"Arquivo associado ao vértice '{identifier}' excluído com sucesso.")  # Mensagem de sucesso
+        else:
+            print(f"Erro ao excluir o arquivo associado ao vértice '{identifier}'.")
+    
 
     elif cmd == "exit":
         sys.exit()
-
-    else:
-        print(f"Comando desconhecido: {cmd}")
 
 def main():
     app = QApplication(sys.argv)
     graph_view = GraphView()
 
     while True:
-        command = input("Digite um comando (add, modify, delete, connect, list, exit): ")
+        command = input("Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): ")
         if command.lower() == 'exit':
             break
         process_command(command, graph_view)
