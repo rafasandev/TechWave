@@ -34,8 +34,6 @@ class MainWindow(QMainWindow):
 
         self.graph_view.setHtml(self.graph_html)
 
-        self.terminal_widget.setMinimumWidth(150)
-
         self.splitter = QSplitter()
         self.splitter.addWidget(self.terminal_widget)
         self.splitter.addWidget(self.graph_view)

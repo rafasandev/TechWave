@@ -12,6 +12,7 @@ class Terminal(QWidget):
         self.terminal = QTextEdit(self)
         self.terminal.setReadOnly(True)
         self.terminal.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
+        self.terminal.setMinimumWidth(600)
 
         self.terminal.setStyleSheet(
             """
@@ -25,6 +26,9 @@ class Terminal(QWidget):
         )
 
         self.input = QLineEdit(self)
+        self.input.setText(
+            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): "
+        )
         self.input.returnPressed.connect(self.process_command)
         self.input.setStyleSheet(
             """
@@ -48,11 +52,22 @@ class Terminal(QWidget):
         self.setLayout(self.terminal_layout)
 
     def process_command(self):
-        command = self.input.text()
+        command = self.input.text().replace(
+            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): ",
+            "",
+        )
 
         output = f"> {command}\n"
         self.terminal.append(output)
+
         self.input.clear()
+        self.input.setText(
+            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): "
+        )
+
         self.terminal.verticalScrollBar().setValue(
             self.terminal.verticalScrollBar().maximum()
         )
+
+    def process_command(command, graph):
+        tokens = command.split
