@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
 from graph_view import GraphView
+import graph_scene
 
 def process_command(command, graph_view):
     tokens = command.split()
@@ -55,46 +56,112 @@ def process_command(command, graph_view):
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.add_aresta(vertex1, vertex2)  
+        graph_view.add_aresta(vertex1, vertex2)
 
     elif cmd == "list":
         graph_view.list_graph()
-    
-    elif cmd == 'cd':
-        if len(tokens) == 3:  # Alterado para tokens
-            name_vertice = tokens[1]  # Alterado para tokens
-            caminho_arquivo = tokens[2]  # Alterado para tokens
-            # Passa os dois argumentos para cd_vertice
-            graph_view.cd_vertice(name_vertice, caminho_arquivo)
+
+    if cmd == "cd":
+        if len(tokens) == 4:  # Se houver 4 tokens (nome_vertice, nome_arquivo, caminho_arquivo)
+            name_vertice = tokens[1]  # Nome do vértice
+            name_arquivo = tokens[2]  # Nome do arquivo
+            caminho_arquivo = tokens[3]  # Caminho do arquivo
+
+            # Verifica se o caminho do arquivo é válido
+            if os.path.exists(caminho_arquivo):
+                # Se o caminho do arquivo existir, chama a função para associar o arquivo ao vértice
+                graph_view.cd_vertice(name_vertice, name_arquivo, caminho_arquivo)
+            else:
+                print(f"Erro: O caminho do arquivo '{caminho_arquivo}' não existe.")
+        elif len(tokens) == 3:  # Caso o usuário não forneça um caminho de arquivo, mas sim um conteúdo
+            name_vertice = tokens[1]  # Nome do vértice
+            name_arquivo = tokens[2]  # Nome do arquivo
+
+            # Pergunta para o usuário o conteúdo do arquivo
+            texto = input("Digite o conteúdo do arquivo:\n")
+
+            # Chama a função para associar o conteúdo diretamente ao vértice
+            graph_view.cd_vertice(name_vertice, name_arquivo, texto=texto)
         else:
-            print("Comando 'cd' inválido. Use: cd <nome_vertice> <caminho_arquivo>")
+            print(
+                "Comando 'cd' inválido. Use: cd <nome_vertice> <nome_arquivo> <caminho_arquivo> ou <conteudo_arquivo>")
 
     if cmd == 'view':
-        if len(tokens) == 2:  # Alterado para tokens
-            identifier = tokens[1]  # Alterado para tokens
-            try:
-                # Tenta converter para int para identificar se é um ID
-                identifier = int(identifier)
-            except ValueError:
-                pass  # Se falhar, permanece como string para buscar pelo nome
-            graph_view.view(identifier)
-        else:
-            print("Comando 'view' inválido. Use: view <nome_ou_id>")
+        if len(tokens) == 2:  # Se houver 2 tokens, o primeiro é o comando, o segundo o identificador
+            identifier = tokens[1]  # O identificador pode ser nome de vértice ou nome de arquivo
 
-    elif cmd == "del_cd":
-        identifier = tokens[1]  # Aqui você quis usar 'tokens', não 'parts'
-        if graph_view.delete_arquivo(identifier):  # Chama a função de exclusão do arquivo
-            print(f"Arquivo associado ao vértice '{identifier}' excluído com sucesso.")  # Mensagem de sucesso
-        else:
-            print(f"Erro ao excluir o arquivo associado ao vértice '{identifier}'.")
-    
+            cursor = graph_view.conn.cursor()  # Abre o cursor para realizar a consulta SQL
 
-    elif cmd == "exit":
+            # Primeira busca: verifica se o identificador é um name_vertice
+            cursor.execute("SELECT COUNT(*) FROM arquivos WHERE name_vertice = ?", (identifier,))
+            result = cursor.fetchone()
+
+            if result[0] > 0:
+                # Se encontrado como name_vertice, chama a função para exibir os arquivos associados ao vértice
+                graph_view.view_vertice(identifier)
+            else:
+                # Segunda busca: verifica se o identificador é um name_arquivo
+                cursor.execute("SELECT COUNT(*) FROM arquivos WHERE name_arquivo = ?", (identifier,))
+                result = cursor.fetchone()
+
+                if result[0] > 0:
+                    # Se encontrado como name_arquivo, chama a função para exibir o conteúdo do arquivo
+                    graph_view.view_arquivo(identifier)
+                else:
+                    # Se não encontrar nenhum dos dois, exibe a mensagem de erro
+                    print(f"Não foi possível encontrar nenhum vértice ou arquivo com o identificador '{identifier}'.")
+
+            cursor.close()  # Fecha o cursor após a execução da consulta
+
+
+
+        else:
+            print("Comando 'view' inválido. Use: view <nome_vertice ou nome_arquivo>")
+
+
+    if cmd == "del_cd":
+        if len(tokens) < 2:
+            print("Erro: Comando incompleto. Use: del_cd <nome_arquivo>")
+            return
+        nome_arquivo = tokens[1]  # Nome do vértice fornecido pelo usuário
+        # Chama o método delete_arquivo da instância de GraphView
+        if graph_view.delete_arquivo(nome_arquivo):
+            print(f"Arquivo associado ao vértice '{nome_arquivo}' excluído com sucesso.")  # Mensagem de sucesso
+        else:
+            print(f"Erro ao excluir o arquivo associado ao vértice '{nome_arquivo}'.")  # Mensagem de erro
+
+    if cmd == "modify_cd":
+        if len(tokens) < 3:
+            print("Erro: Comando incompleto. Use: modify_cd (id/nome) (novo_conteudo_txt)")
+            return
+        identifier = tokens[1]  # ID ou nome do vértice
+        new_txt = " ".join(tokens[2:])  # O conteúdo do arquivo a ser atualizado
+
+        try:
+            # Tenta converter o identificador para int (ID)
+            identifier = int(identifier)
+        except ValueError:
+            pass  # Se não for um número, mantemos como nome do vértice
+
+        if graph_view.modify_cd(identifier, new_txt):
+            print(f"Conteúdo do arquivo associado ao vértice '{identifier}' atualizado com sucesso.")
+        else:
+            print(f"Erro ao atualizar o conteúdo do arquivo associado ao vértice '{identifier}'.")
+
+    if cmd == "exit":
         sys.exit()
+
+
+import sqlite3  # Usando SQLite como exemplo
 
 def main():
     app = QApplication(sys.argv)
-    graph_view = GraphView()
+
+    # Criação da conexão com o banco de dados
+    conn = sqlite3.connect("graph.db")  # Substitua pelo caminho correto do seu banco de dados
+
+    # Passa a conexão para o GraphView
+    graph_view = GraphView(conn)  # Agora você passa a conexão para o GraphView
 
     while True:
         command = input("Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): ")
@@ -103,6 +170,8 @@ def main():
         process_command(command, graph_view)
 
     sys.exit(app.exec())
+
+
 
 if __name__ == "__main__":
     main()
