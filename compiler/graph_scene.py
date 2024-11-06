@@ -6,6 +6,7 @@ import sqlite3
 import matplotlib.pyplot as plt
 import os
 
+
 class Vertice:
     def __init__(self, id, name, category, custo):
         self.id = id
@@ -45,6 +46,7 @@ class GraphScene(QGraphicsScene):
             self.conn.execute('''
                 CREATE TABLE IF NOT EXISTS arquivos (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name_arquivo TEXT NOT NULL,
                     name_vertice TEXT NOT NULL,
                     txt BLOB
                 )
@@ -133,9 +135,9 @@ class GraphScene(QGraphicsScene):
         self.conn.commit()
 
         # Remove a aresta da lista local
-        self.arestas = [aresta for aresta in self.arestas if not (aresta[0] == vertex1 and aresta[1] == vertex2) and not (
-                    aresta[0] == vertex2 and aresta[1] == vertex1)]
-
+        self.arestas = [aresta for aresta in self.arestas if
+                        not (aresta[0] == vertex1 and aresta[1] == vertex2) and not (
+                                aresta[0] == vertex2 and aresta[1] == vertex1)]
 
         print(f"Aresta entre '{vertex1}' e '{vertex2}' removida.")
         cursor.close()
@@ -205,7 +207,6 @@ class GraphScene(QGraphicsScene):
                 else:
                     print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
 
-
         cursor.close()
 
     def add_aresta(self, vertex1, vertex2):
@@ -252,52 +253,82 @@ class GraphScene(QGraphicsScene):
         print(f"Aresta conectada entre '{vertex1}' e '{vertex2}'.")
         cursor.close()
 
-    def inserir_arquivo_txt(self, name_vertice, caminho_arquivo):
-        """Insere o conteúdo de um arquivo .txt na tabela arquivos associado ao name_vertice."""
-        try:
-            # Abre o arquivo .txt no modo de leitura
-            with open(caminho_arquivo, 'r', encoding='utf-8') as file:  # Use 'r' para leitura de texto
-                arquivo = file.read()  # Lê todo o conteúdo do arquivo
+        def inserir_arquivo_txt(self, name_vertice, name_arquivo, caminho_arquivo):
+            """Insere o conteúdo de um arquivo .txt na tabela arquivos associado ao name_vertice."""
+            try:
+                # Verifica se o caminho do arquivo existe
+                if not os.path.exists(caminho_arquivo):
+                    print(f"Erro: O arquivo '{caminho_arquivo}' não foi encontrado.")
+                    return
 
-            cursor = self.conn.cursor()
-            cursor.execute('INSERT INTO arquivos (name_vertice, txt) VALUES (?, ?)', (name_vertice, arquivo))
-            self.conn.commit()  # Comita a transação para salvar as alterações
-            print(f"Arquivo '{caminho_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
-            cursor.close()
-        except Exception as e:
-            print(f"Erro ao inserir arquivo .txt: {e}")
+                # Abre o arquivo .txt no modo de leitura
+                with open(caminho_arquivo, 'r', encoding='utf-8') as file:
+                    arquivo = file.read()  # Lê todo o conteúdo do arquivo
 
+                cursor = self.conn.cursor()
 
-    def close(self):
-        self.conn.close()
+                # Insere o conteúdo do arquivo no banco de dados
+                cursor.execute('''
+                    INSERT INTO arquivos (name_vertice, name_arquivo, txt)
+                    VALUES (?, ?, ?)
+                ''', (name_vertice, name_arquivo, arquivo))
 
-    def view_arquivo_txt(self, identifier):
-        cursor = self.conn.cursor()  # Cria um cursor aqui
-        # Checa se o identifier é um ID numérico ou um nome
-        if isinstance(identifier, int):
-            query = "SELECT txt FROM arquivos WHERE id = ?"
-            cursor.execute(query, (identifier,))
-        else:
-            query = "SELECT txt FROM arquivos WHERE name_vertice = ?"
-            cursor.execute(query, (identifier,))
-        
+                self.conn.commit()  # Confirma a transação para salvar as alterações
+                print(f"Arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
+                cursor.close()
+
+            except Exception as e:
+                print(f"Erro ao inserir arquivo .txt: {e}")
+
+        def inserir_texto_arquivo(self, name_vertice, name_arquivo, texto):
+            """Insere o conteúdo do texto na tabela arquivos associado ao name_vertice."""
+            try:
+                cursor = self.conn.cursor()
+
+                # Insere o conteúdo do texto no banco de dados
+                cursor.execute('''
+                    INSERT INTO arquivos (name_vertice, name_arquivo, txt)
+                    VALUES (?, ?, ?)
+                ''', (name_vertice, name_arquivo, texto))
+
+                self.conn.commit()  # Confirma a transação para salvar as alterações
+                print(f"Conteúdo do arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
+                cursor.close()
+
+            except Exception as e:
+                print(f"Erro ao inserir texto no arquivo: {e}")
+
+    def view_arquivo(self, name_arquivo):
+        """Exibe o conteúdo de um arquivo específico."""
+        cursor = self.conn.cursor()
+
+        # Consulta o conteúdo do arquivo baseado no nome do arquivo
+        cursor.execute('SELECT txt FROM arquivos WHERE name_arquivo = ?', (name_arquivo,))
+
         result = cursor.fetchone()
-        cursor.close()  # Fecha o cursor após a execução da consulta
-        if result:
-            return result[0]  # Retorna o conteúdo do arquivo
-        else:
-            print("Arquivo não encontrado.")
-            return None
-        
-    def delete_arquivo(self, nome_vertice):
-        """Remove o registro do arquivo associado ao vértice do banco de dados."""
-        cursor = self.conn.cursor()  # Use o cursor da conexão existente
-        cursor.execute("DELETE txt FROM arquivos WHERE name_vertice=?", (nome_vertice,))
-        self.conn.commit()  # Comita a transação após a exclusão
 
-        if cursor.rowcount > 0:
-            print(f"Arquivo associado ao vértice '{nome_vertice}' excluído com sucesso do banco de dados.")
-            return True
+        if result:
+            print(f"Conteúdo do arquivo '{name_arquivo}':")
+            print(result[0])  # Exibe o conteúdo do arquivo
         else:
-            print(f"Erro: Vértice '{nome_vertice}' não encontrado no banco de dados.")
-            return False
+            print(f"Erro: Arquivo '{name_arquivo}' não encontrado.")
+
+        cursor.close()
+
+    def view_vertice(self, name_vertice):
+        """Exibe todos os arquivos associados ao vértice."""
+        cursor = self.conn.cursor()
+
+        # Consulta os arquivos relacionados ao vértice pelo nome
+        cursor.execute('SELECT name_arquivo FROM arquivos WHERE name_vertice = ?', (name_vertice,))
+
+        files = cursor.fetchall()
+
+        if files:
+            print(f"Arquivos associados ao vértice '{name_vertice}':")
+            for file in files:
+                print(file[0])  # Exibe apenas o nome do arquivo
+        else:
+            print(f"Erro: Nenhum arquivo encontrado para o vértice '{name_vertice}'.")
+
+        cursor.close()
