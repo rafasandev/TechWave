@@ -1,7 +1,6 @@
 import sys
 
 from terminal import Terminal
-from modal import Modal
 import graph
 
 from PyQt6.QtWidgets import (
@@ -46,8 +45,6 @@ class MainWindow(QMainWindow):
         self.central_layout = QVBoxLayout()
         self.central_layout.addWidget(self.splitter)
 
-        self.floating_window = Modal(self)
-
         self.central_layout.setSpacing(0)
         self.central_layout.setContentsMargins(0, 0, 0, 0)
 
@@ -57,10 +54,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         self.showMaximized()
-
-    def open_modal(self):
-        self.floating_window.move(300, 200)
-        self.floating_window.show()
 
 
 app = QApplication(sys.argv)

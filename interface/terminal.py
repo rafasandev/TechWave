@@ -1,7 +1,9 @@
-# from PyQt6.QtGui import QTextCursor
+import sys
+import os
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit
 
-# from PyQt6.QtCore import Qt, QEvent
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from compiler.main import *
 
 
 class Terminal(QWidget):
@@ -26,9 +28,6 @@ class Terminal(QWidget):
         )
 
         self.input = QLineEdit(self)
-        self.input.setText(
-            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): "
-        )
         self.input.returnPressed.connect(self.process_command)
         self.input.setStyleSheet(
             """
@@ -52,22 +51,17 @@ class Terminal(QWidget):
         self.setLayout(self.terminal_layout)
 
     def process_command(self):
-        command = self.input.text().replace(
-            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): ",
-            "",
-        )
+        command = self.input.text()
 
         output = f"> {command}\n"
         self.terminal.append(output)
 
         self.input.clear()
-        self.input.setText(
-            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): "
-        )
 
         self.terminal.verticalScrollBar().setValue(
             self.terminal.verticalScrollBar().maximum()
         )
 
-    def process_command(command, graph):
-        tokens = command.split
+        graph_view = GraphView()
+
+        process_command(command, graph_view)

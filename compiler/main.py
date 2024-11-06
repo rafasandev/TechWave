@@ -1,6 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from graph_view import GraphView
+from .graph_view import GraphView
+
 
 def process_command(command, graph_view):
     tokens = command.split()
@@ -22,7 +23,9 @@ def process_command(command, graph_view):
 
     elif cmd == "md":
         if len(tokens) < 3:
-            print("Erro: Comando incompleto. Use: md (id) (novo_nome) [nova_categoria] [novo_custo]")
+            print(
+                "Erro: Comando incompleto. Use: md (id) (novo_nome) [nova_categoria] [novo_custo]"
+            )
             return
         try:
             old_id = int(tokens[1])  # ID deve ser um inteiro
@@ -47,7 +50,9 @@ def process_command(command, graph_view):
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.delete_aresta(vertex1, vertex2)  # Chama delete_aresta para excluir a aresta específica
+        graph_view.delete_aresta(
+            vertex1, vertex2
+        )  # Chama delete_aresta para excluir a aresta específica
 
     elif cmd == "connect":
         if len(tokens) != 3:
@@ -55,12 +60,12 @@ def process_command(command, graph_view):
             return
         vertex1 = tokens[1]
         vertex2 = tokens[2]
-        graph_view.add_aresta(vertex1, vertex2)  
+        graph_view.add_aresta(vertex1, vertex2)
 
     elif cmd == "list":
         graph_view.list_graph()
-    
-    elif cmd == 'cd':
+
+    elif cmd == "cd":
         if len(tokens) == 3:  # Alterado para tokens
             name_vertice = tokens[1]  # Alterado para tokens
             caminho_arquivo = tokens[2]  # Alterado para tokens
@@ -69,7 +74,7 @@ def process_command(command, graph_view):
         else:
             print("Comando 'cd' inválido. Use: cd <nome_vertice> <caminho_arquivo>")
 
-    if cmd == 'view':
+    if cmd == "view":
         if len(tokens) == 2:  # Alterado para tokens
             identifier = tokens[1]  # Alterado para tokens
             try:
@@ -83,26 +88,33 @@ def process_command(command, graph_view):
 
     elif cmd == "del_cd":
         identifier = tokens[1]  # Aqui você quis usar 'tokens', não 'parts'
-        if graph_view.delete_arquivo(identifier):  # Chama a função de exclusão do arquivo
-            print(f"Arquivo associado ao vértice '{identifier}' excluído com sucesso.")  # Mensagem de sucesso
+        if graph_view.delete_arquivo(
+            identifier
+        ):  # Chama a função de exclusão do arquivo
+            print(
+                f"Arquivo associado ao vértice '{identifier}' excluído com sucesso."
+            )  # Mensagem de sucesso
         else:
             print(f"Erro ao excluir o arquivo associado ao vértice '{identifier}'.")
-    
 
     elif cmd == "exit":
         sys.exit()
+
 
 def main():
     app = QApplication(sys.argv)
     graph_view = GraphView()
 
     while True:
-        command = input("Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): ")
-        if command.lower() == 'exit':
+        command = input(
+            "Digite um comando (add, modify, del, connect, list, del_aresta, cd exit): "
+        )
+        if command.lower() == "exit":
             break
         process_command(command, graph_view)
 
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     main()
