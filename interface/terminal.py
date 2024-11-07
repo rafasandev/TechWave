@@ -1,6 +1,6 @@
 import sys
 import os
-from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit
+from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit, QGraphicsView
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from compiler.main import *
@@ -62,6 +62,6 @@ class Terminal(QWidget):
             self.terminal.verticalScrollBar().maximum()
         )
 
-        graph_view = GraphView()
+        graph_view = GraphView(QGraphicsView)
 
         process_command(command, graph_view)

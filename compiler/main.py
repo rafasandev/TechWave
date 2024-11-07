@@ -1,7 +1,7 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from graph_view import GraphView
-import graph_scene
+from .graph_view import GraphView
+from .graph_scene import *
 
 
 def process_command(command, graph_view):
