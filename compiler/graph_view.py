@@ -42,7 +42,7 @@ class GraphView(QGraphicsView):
             # Chama a função para inserir o texto diretamente
             self.scene.inserir_texto_arquivo(name_vertice, name_arquivo, texto)
         else:
-            print("Erro: Nenhum caminho de arquivo ou texto fornecido.")
+            return "Erro: Nenhum caminho de arquivo ou texto fornecido."
 
     def view_arquivo(self, name_arquivo):
         """Exibe o conteúdo de um arquivo específico."""
@@ -54,10 +54,9 @@ class GraphView(QGraphicsView):
         result = cursor.fetchone()
 
         if result:
-            print(f"Conteúdo do arquivo '{name_arquivo}':")
-            print(result[0])  # Exibe o conteúdo do arquivo
+            return f"Conteúdo do arquivo '{name_arquivo}':"
         else:
-            print(f"Erro: Arquivo '{name_arquivo}' não encontrado.")
+            return f"Erro: Arquivo '{name_arquivo}' não encontrado."
 
         cursor.close()
 
@@ -71,13 +70,12 @@ class GraphView(QGraphicsView):
         files = cursor.fetchall()
 
         if files:
-            print(f"Arquivos associados ao vértice '{name_vertice}':")
             for file in files:
-                print(file[0])  # Exibe apenas o nome do arquivo
+                return file[0]  # Exibe apenas o nome do arquiv
         else:
-            print(f"Erro: Nenhum arquivo encontrado para o vértice '{name_vertice}'.")
-
+            return f"Erro: Nenhum arquivo encontrado para o vértice '{name_vertice}'."
         cursor.close()
+
 
 
     def delete_arquivo(self, identifier):
@@ -109,9 +107,8 @@ class GraphView(QGraphicsView):
             return True
         else:
             # Caso o arquivo não seja encontrado
-            print(f"Erro: Arquivo não encontrado para o vértice '{identifier}'.")
             cursor.close()
-            return False
+            return f"Erro: Arquivo não encontrado para o vértice '{identifier}'."
 
     def modify_cd(self, identifier, new_txt):
         """Modifica o conteúdo do arquivo associado ao vértice."""
@@ -137,11 +134,9 @@ class GraphView(QGraphicsView):
                 cursor.execute(update_query, (new_txt, result[0]))  # Usa o ID encontrado para atualizar
 
             self.conn.commit()  # Confirma a transação
-            print(f"Conteúdo do arquivo associado ao vértice '{identifier}' atualizado com sucesso.")
             cursor.close()
-            return True
+            return f"Conteúdo do arquivo associado ao vértice '{identifier}' atualizado com sucesso."
         else:
             # Caso o arquivo não seja encontrado
-            print(f"Erro: Arquivo não encontrado para o vértice '{identifier}'.")
             cursor.close()
-            return False
+            return f"Erro: Arquivo não encontrado para o vértice '{identifier}'."

@@ -58,9 +58,8 @@ class GraphScene(QGraphicsScene):
         # Verifica se o vértice já existe
         cursor.execute("SELECT id FROM vertices WHERE name = ?", (name,))
         if cursor.fetchone():
-            print(f"Vértice '{name}' já existe.")
             cursor.close()
-            return
+            return f"Vértice '{name}' já existe."
 
         try:
             with self.conn:
@@ -77,9 +76,9 @@ class GraphScene(QGraphicsScene):
                 'custo': custo,
             }
 
-            print(f"Vértice '{name}' adicionado com sucesso.")
+            return f"Vértice '{name}' adicionado com sucesso."
         except sqlite3.IntegrityError as e:
-            print(f"Erro ao adicionar vértice: {e}")
+            return f"Erro ao adicionar vértice: {e}"
         finally:
             cursor.close()
 
@@ -92,10 +91,8 @@ class GraphScene(QGraphicsScene):
         result = cursor.fetchone()
 
         if not result:
-            print(f"Erro: O vértice '{old_name}' não existe no banco de dados.")
             cursor.close()
-            return
-
+            return f"Erro: O vértice '{old_name}' não existe no banco de dados."
         vertex_id = result[0]
 
         # Prepara a atualização
@@ -122,8 +119,8 @@ class GraphScene(QGraphicsScene):
             self.vertices.remove(old_name)
             self.vertices.add(new_name)
 
-        print(f"Vértice '{old_name}' modificado com sucesso.")
         cursor.close()
+        return f"Vértice '{old_name}' modificado com sucesso."
 
     def delete_aresta(self, vertex1, vertex2):
         """Remove uma aresta específica entre dois vértices."""
@@ -139,22 +136,20 @@ class GraphScene(QGraphicsScene):
                         not (aresta[0] == vertex1 and aresta[1] == vertex2) and not (
                                 aresta[0] == vertex2 and aresta[1] == vertex1)]
 
-        print(f"Aresta entre '{vertex1}' e '{vertex2}' removida.")
         cursor.close()
+        return f"Aresta entre '{vertex1}' e '{vertex2}' removida."
 
     def list_graph(self):
         cursor = self.conn.cursor()
 
-        print("Lista de Vértices:")
         cursor.execute('SELECT * FROM vertices')
         for row in cursor.fetchall():
             id, name, category, custo = row
-            print(f"ID: {id}, Nome: {name}, Categoria: {category}, custo: {custo}")
+            return f"ID: {id}, Nome: {name}, Categoria: {category}, custo: {custo}"
 
-        print("\nLista de Arestas:")
         cursor.execute('SELECT name1, name2 FROM arestas')
         for aresta in cursor.fetchall():
-            print(f"Aresta entre {aresta[0]} e {aresta[1]}")
+            return f"Aresta entre {aresta[0]} e {aresta[1]}"
 
         cursor.close()
 
@@ -172,7 +167,7 @@ class GraphScene(QGraphicsScene):
                 # Remove o vértice do banco de dados
                 cursor.execute('DELETE FROM vertices WHERE id = ?', (identifier,))
                 self.conn.commit()
-                print(f"Vértice com ID {identifier} removido.")
+                return f"Vértice com ID {identifier} removido."
             else:
                 # Tenta apagar pelo nome se não encontrar pelo ID
                 cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
@@ -182,9 +177,9 @@ class GraphScene(QGraphicsScene):
                     # Remove o vértice do banco de dados
                     cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
                     self.conn.commit()
-                    print(f"Vértice com nome '{identifier}' removido.")
+                    return f"Vértice com nome '{identifier}' removido."
                 else:
-                    print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
+                    return f"Nenhum vértice encontrado com ID ou nome '{identifier}'."
         else:
             cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
             vertice = cursor.fetchone()
@@ -193,7 +188,7 @@ class GraphScene(QGraphicsScene):
                 # Remove o vértice do banco de dados
                 cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
                 self.conn.commit()
-                print(f"Vértice com ID {identifier} removido.")
+                return f"Vértice com ID {identifier} removido."
             else:
                 # Tenta apagar pelo nome se não encontrar pelo ID
                 cursor.execute('SELECT * FROM vertices WHERE name = ?', (identifier,))
@@ -203,9 +198,9 @@ class GraphScene(QGraphicsScene):
                     # Remove o vértice do banco de dados
                     cursor.execute('DELETE FROM vertices WHERE name = ?', (identifier,))
                     self.conn.commit()
-                    print(f"Vértice com nome '{identifier}' removido.")
+                    return f"Vértice com nome '{identifier}' removido."
                 else:
-                    print(f"Nenhum vértice encontrado com ID ou nome '{identifier}'.")
+                    return f"Nenhum vértice encontrado com ID ou nome '{identifier}'."
 
         cursor.close()
 
@@ -222,9 +217,9 @@ class GraphScene(QGraphicsScene):
         result2 = cursor.fetchone()
 
         if not result1 or not result2:
-            print(f"Erro: Um ou ambos os vértices '{vertex1}' e '{vertex2}' não existem no banco de dados.")
             cursor.close()
-            return
+            return f"Erro: Um ou ambos os vértices '{vertex1}' e '{vertex2}' não existem no banco de dados."
+
 
         # Extrai os IDs e posições dos vértices a partir do resultado das consultas
         id1, pos1_str = result1
@@ -239,7 +234,7 @@ class GraphScene(QGraphicsScene):
         existing_edge = cursor.fetchone()
 
         if existing_edge:
-            print(f"Erro: A aresta entre '{vertex1}' e '{vertex2}' já existe.")
+            return f"Erro: A aresta entre '{vertex1}' e '{vertex2}' já existe."
             cursor.close()
             return
 
@@ -250,7 +245,6 @@ class GraphScene(QGraphicsScene):
         # Adiciona a aresta na lista local de arestas
         self.arestas.append((vertex1, vertex2))
 
-        print(f"Aresta conectada entre '{vertex1}' e '{vertex2}'.")
         cursor.close()
 
         def inserir_arquivo_txt(self, name_vertice, name_arquivo, caminho_arquivo):
@@ -258,7 +252,7 @@ class GraphScene(QGraphicsScene):
             try:
                 # Verifica se o caminho do arquivo existe
                 if not os.path.exists(caminho_arquivo):
-                    print(f"Erro: O arquivo '{caminho_arquivo}' não foi encontrado.")
+                    return f"Erro: O arquivo '{caminho_arquivo}' não foi encontrado."
                     return
 
                 # Abre o arquivo .txt no modo de leitura
@@ -274,11 +268,11 @@ class GraphScene(QGraphicsScene):
                 ''', (name_vertice, name_arquivo, arquivo))
 
                 self.conn.commit()  # Confirma a transação para salvar as alterações
-                print(f"Arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
+                return f"Arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'."
                 cursor.close()
 
             except Exception as e:
-                print(f"Erro ao inserir arquivo .txt: {e}")
+                return f"Erro ao inserir arquivo .txt: {e}"
 
         def inserir_texto_arquivo(self, name_vertice, name_arquivo, texto):
             """Insere o conteúdo do texto na tabela arquivos associado ao name_vertice."""
@@ -292,11 +286,11 @@ class GraphScene(QGraphicsScene):
                 ''', (name_vertice, name_arquivo, texto))
 
                 self.conn.commit()  # Confirma a transação para salvar as alterações
-                print(f"Conteúdo do arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'.")
+                return f"Conteúdo do arquivo '{name_arquivo}' armazenado com sucesso para o vértice '{name_vertice}'."
                 cursor.close()
 
             except Exception as e:
-                print(f"Erro ao inserir texto no arquivo: {e}")
+                return f"Erro ao inserir texto no arquivo: {e}"
 
     def view_arquivo(self, name_arquivo):
         """Exibe o conteúdo de um arquivo específico."""
@@ -308,12 +302,11 @@ class GraphScene(QGraphicsScene):
         result = cursor.fetchone()
 
         if result:
-            print(f"Conteúdo do arquivo '{name_arquivo}':")
-            print(result[0])  # Exibe o conteúdo do arquivo
+            return result[0]  # Exibe o conteúdo do arquiv
         else:
-            print(f"Erro: Arquivo '{name_arquivo}' não encontrado.")
-
+            return f"Erro: Arquivo '{name_arquivo}' não encontrado."
         cursor.close()
+
 
     def view_vertice(self, name_vertice):
         """Exibe todos os arquivos associados ao vértice."""
@@ -325,10 +318,9 @@ class GraphScene(QGraphicsScene):
         files = cursor.fetchall()
 
         if files:
-            print(f"Arquivos associados ao vértice '{name_vertice}':")
             for file in files:
-                print(file[0])  # Exibe apenas o nome do arquivo
+                return file[0]  # Exibe apenas o nome do arquiv
         else:
-            print(f"Erro: Nenhum arquivo encontrado para o vértice '{name_vertice}'.")
-
+            return f"Erro: Nenhum arquivo encontrado para o vértice '{name_vertice}'."
         cursor.close()
+
