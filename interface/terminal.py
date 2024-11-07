@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit, QGraphic
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from compiler.main import *
+from compiler.graph_scene import *
 
 
 class Terminal(QWidget):
@@ -62,6 +63,12 @@ class Terminal(QWidget):
             self.terminal.verticalScrollBar().maximum()
         )
 
-        graph_view = GraphView(QGraphicsView)
+        graph_view = GraphScene()
+        response = process_command(command, graph_view)
+        print(response)
 
-        process_command(command, graph_view)
+        self.terminal.append(response)
+
+        self.terminal.verticalScrollBar().setValue(
+            self.terminal.verticalScrollBar().maximum()
+        )

@@ -165,7 +165,7 @@ class GraphScene(QGraphicsScene):
 
         cursor.close()
 
-        cursor.fetchall()
+        return cursor.fetchall()
 
     def close(self):
         self.conn.close()

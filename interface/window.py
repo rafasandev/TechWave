@@ -2,6 +2,9 @@ import sys
 
 from terminal import Terminal
 import graph
+import sqlite3
+
+from compiler.graph_scene import GraphScene
 
 from PyQt6.QtWidgets import (
     QApplication,
@@ -14,11 +17,17 @@ from PyQt6.QtGui import QMouseEvent, QPalette
 from PyQt6.QtCore import Qt, QSize, QEvent
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 
+conn = sqlite3.connect("graph.db")
+
 
 class MainWindow(QMainWindow):
 
-    def __init__(self):
+    def __init__(self, conn):
         super().__init__()
+        self.conn = conn
+
+        self.getDatabaseData
+
         self.setWindowTitle("Tech Wave")
         self.setMinimumSize(920, 720)
 
@@ -55,10 +64,14 @@ class MainWindow(QMainWindow):
 
         self.showMaximized()
 
+    def getDatabaseData():
+        graph = GraphScene()
+        print("instanciado")
+
 
 app = QApplication(sys.argv)
 
-window = MainWindow()
+window = MainWindow(conn)
 window.show()
 
 app.exec()

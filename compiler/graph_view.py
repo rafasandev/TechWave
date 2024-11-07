@@ -13,41 +13,44 @@ class GraphView(QGraphicsView):
         self.conn = conn  # Atribui a conexão à instância de GraphView
 
     def add_vertex(self, name, category=None, custo=None):
-        self.scene.add_vertex(name, category, custo)
+        return self.scene.add_vertex(name, category, custo)
+
         self.vertices[name] = {
             "category": category,
             "custo": custo,
         }  # Adiciona ao dicionário de vértices
 
     def delete_aresta(self, vertex1, vertex2):
-        self.scene.delete_aresta(vertex1, vertex2)
+        return self.scene.delete_aresta(vertex1, vertex2)
 
     def modify_vertice(self, old_id, new_name, new_category=None, custo=None):
-        self.scene.modify_vertex(old_id, new_name, new_category, custo)
+        return self.scene.modify_vertex(old_id, new_name, new_category, custo)
         if old_id in self.vertices:
             self.vertices[new_name] = self.vertices.pop(
                 old_id
             )  # Atualiza o dicionário de vértices
 
     def delete_vertice(self, id):
-        self.scene.delete_vertice(id)
+        return self.scene.delete_vertice(id)
         if id in self.vertices:
             del self.vertices[id]  # Remove do dicionário de vértices
 
     def add_aresta(self, id1, id2):
-        self.scene.add_aresta(id1, id2)
+        return self.scene.add_aresta(id1, id2)
 
     def list_graph(self):
-        self.scene.list_graph()
+        return self.scene.list_graph()
 
     def cd_vertice(self, name_vertice, name_arquivo, caminho_arquivo=None, texto=None):
         """Insere ou atualiza o arquivo associado ao vértice."""
         if caminho_arquivo:  # Se o caminho do arquivo foi fornecido
             # Chama a função para inserir o conteúdo do arquivo
-            self.scene.inserir_arquivo_txt(name_vertice, name_arquivo, caminho_arquivo)
+            return self.scene.inserir_arquivo_txt(
+                name_vertice, name_arquivo, caminho_arquivo
+            )
         elif texto:  # Se o texto foi fornecido diretamente
             # Chama a função para inserir o texto diretamente
-            self.scene.inserir_texto_arquivo(name_vertice, name_arquivo, texto)
+            return self.scene.inserir_texto_arquivo(name_vertice, name_arquivo, texto)
         else:
             return "Erro: Nenhum caminho de arquivo ou texto fornecido."
 
