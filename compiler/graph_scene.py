@@ -154,18 +154,17 @@ class GraphScene(QGraphicsScene):
         cursor = self.conn.cursor()
 
         cursor.execute("SELECT * FROM vertices")
-        for row in cursor.fetchall():
-            id, name, category, custo = row
-            return f"ID: {id}, Nome: {name}, Categoria: {category}, custo: {custo}"
+        # for row in cursor.fetchall():
+        #     id, name, category, custo = row
+        #     return f"ID: {id}, Nome: {name}, Categoria: {category}, custo: {custo}"
+        return cursor.fetchall()
 
         cursor.execute("SELECT name1, name2 FROM arestas")
 
-        for aresta in cursor.fetchall():
-            return f"Aresta entre {aresta[0]} e {aresta[1]}"
+        # for aresta in cursor.fetchall():
+        #     return f"Aresta entre {aresta[0]} e {aresta[1]}"
 
         cursor.close()
-
-        return cursor.fetchall()
 
     def close(self):
         self.conn.close()

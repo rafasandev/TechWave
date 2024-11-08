@@ -15,7 +15,7 @@ def process_command(command, graph_view):
 
     if cmd == "add":
         if len(tokens) < 2:
-            return "Erro: Comando incompleto. Use: add (nome) [categoria] [posição]"
+            return "Erro: Comando incompleto. Use: add (nome) [categoria] [valor]"
         name = tokens[1]
         category = tokens[2] if len(tokens) > 2 else None
         custo = tokens[3] if len(tokens) > 3 else 0
