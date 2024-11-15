@@ -153,10 +153,21 @@ class GraphScene(QGraphicsScene):
     def list_graph(self):
         cursor = self.conn.cursor()
 
-        cursor.execute("SELECT * FROM vertices")
-        # for row in cursor.fetchall():
-        #     id, name, category, custo = row
-        #     return f"ID: {id}, Nome: {name}, Categoria: {category}, custo: {custo}"
+        cursor.execute(
+            """SELECT 
+                    v1.name AS vertice,
+                    v1.category AS categoria,
+                    v1.custo AS valor,
+                    COALESCE(v2.name, NULL) AS conectado_com
+                FROM 
+                    vertices v1
+                LEFT JOIN 
+                    arestas a ON v1.name = a.name1 OR v1.name = a.name2
+                LEFT JOIN 
+                    vertices v2 ON (a.name1 = v1.name AND a.name2 = v2.name) OR (a.name2 = v1.name AND a.name1 = v2.name)
+                ORDER BY 
+                    v1.name"""
+        )
         return cursor.fetchall()
 
         cursor.execute("SELECT name1, name2 FROM arestas")

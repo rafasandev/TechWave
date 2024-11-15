@@ -40,7 +40,7 @@ def process_command(command, graph_view):
         else:
             return "Erro: Comando incompleto. Use: delete (id/nome)"
 
-    elif cmd == "del a":
+    elif cmd == "del_aresta":
         if len(tokens) < 3:
             return "Erro: Comando incompleto. Use: del_aresta (nome1) (nome2)"
         vertex1 = tokens[1]

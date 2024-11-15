@@ -33,6 +33,8 @@ class MainWindow(QMainWindow):
 
         self.terminal_widget = Terminal()
 
+        graph.get_graph_db()
+
         self.graph_html = graph.generate_graph_html()
         self.graph_html = self.graph_html.replace(
             "<body>", "<body style='margin: -10px -2px 15px -2px; overflow: hidden;'>"

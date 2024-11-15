@@ -67,6 +67,9 @@ class Terminal(QWidget):
         response = process_command(command, graph_view)
         print(response)
 
+        if command == "list":
+            response = ""
+
         self.terminal.append(response)
 
         self.terminal.verticalScrollBar().setValue(
