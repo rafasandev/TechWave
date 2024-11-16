@@ -53,6 +53,8 @@ def generate_graph_html():
 
     Graph = create_graph_complete(graph_db)
 
+    positions = nx.spring_layout(Graph, seed=42)
+
     net = Network(
         notebook=False,
         cdn_resources="remote",
@@ -61,7 +63,24 @@ def generate_graph_html():
         font_color="#ffffff",
     )
 
-    net.from_nx(Graph)
+    for node, pos in positions.items():
+        x, y = pos[0] * 1000, pos[1] * 1000
+        net.add_node(
+            node,
+            x=x,
+            y=y,
+            title=Graph.nodes[node].get("title"),
+            group=Graph.nodes[node].get("group"),
+            size=Graph.nodes[node].get("size"),
+        )
 
-    net.force_atlas_2based()
+    for edge in Graph.edges(data=True):
+        net.add_edge(
+            edge[0],
+            edge[1],
+            weight=edge[2].get("weight"),
+            color=edge[2].get("color"),
+        )
+    # net.from_nx(Graph)
+
     return net.generate_html()
