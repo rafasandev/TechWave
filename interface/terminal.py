@@ -1,13 +1,18 @@
 import sys
 import os
 from PyQt6.QtWidgets import QWidget, QTextEdit, QVBoxLayout, QLineEdit, QGraphicsView
+from PyQt6.QtCore import pyqtSignal
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from compiler.main import *
 from compiler.graph_scene import *
 
+import graph
+
 
 class Terminal(QWidget):
+
+    graph_updated = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -56,15 +61,14 @@ class Terminal(QWidget):
 
         output = f"> {command}\n"
         self.terminal.append(output)
-
-        self.input.clear()
-
         self.terminal.verticalScrollBar().setValue(
             self.terminal.verticalScrollBar().maximum()
         )
 
+        self.input.clear()
+
         graph_view = GraphScene()
-        response = process_command(command, graph_view)
+        response = graph.process_command(command, graph_view)
         print(response)
 
         if command == "list":
@@ -75,3 +79,5 @@ class Terminal(QWidget):
         self.terminal.verticalScrollBar().setValue(
             self.terminal.verticalScrollBar().maximum()
         )
+
+        self.graph_updated.emit()

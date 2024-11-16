@@ -26,12 +26,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.conn = conn
 
-        self.getDatabaseData
-
         self.setWindowTitle("Tech Wave")
         self.setMinimumSize(920, 720)
 
         self.terminal_widget = Terminal()
+        self.terminal_widget.graph_updated.connect(self.update_graph)
 
         graph.get_graph_db()
 
@@ -41,7 +40,6 @@ class MainWindow(QMainWindow):
         )
 
         self.graph_view = QWebEngineView()
-
         self.graph_view.setHtml(self.graph_html)
 
         self.splitter = QSplitter()
@@ -66,9 +64,13 @@ class MainWindow(QMainWindow):
 
         self.showMaximized()
 
-    def getDatabaseData():
-        graph = GraphScene()
-        print("instanciado")
+    def update_graph(self):
+
+        self.graph_html = graph.generate_graph_html()
+        self.graph_html = self.graph_html.replace(
+            "<body>", "<body style='margin: -10px -2px 15px -2px; overflow: hidden;'>"
+        )
+        self.graph_view.setHtml(self.graph_html)
 
 
 app = QApplication(sys.argv)

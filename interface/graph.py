@@ -1,6 +1,5 @@
 import sys
 import os
-import random
 import networkx as nx
 from pyvis.network import Network
 from compiler.main import *
@@ -26,57 +25,26 @@ def create_graph_complete(raw_data):
             connections=data[3],
         )
 
-        cor_vertice = definir_cor_vertice(vertice.category)
-
         Graph.add_node(
-            vertice.name,
+            node_for_adding=vertice.name,
             category=vertice.category,
-            color=cor_vertice,
             group=vertice.category,
             size=20,
-            title=vertice.category,
+            title=(
+                vertice.category
+                if (vertice.category is not None or vertice.category)
+                else vertice.name
+            ),
         )
 
-        if vertice.connections is None:
-            Graph.add_edge(
-                u_for_edge=vertice.name,
-                weight=(vertice.value / 10) + 5,
-                color="rgba(208,204,202,0.8)",
-            )
-        else:
+        if vertice.connections is not None:
             Graph.add_edge(
                 u_for_edge=vertice.name,
                 v_for_edge=vertice.connections,
                 weight=(vertice.value / 10) + 5,
                 color="rgba(208,204,202,0.8)",
             )
-
     return Graph
-
-
-def definir_cor_vertice(category):
-
-    categorias = {
-        "frontend": "#FFB3B3",
-        "backend": "#FF6666",
-        "servidor": "#FF3333",
-        "frontend": "#B3FFB3",
-        "frontend": "#66FF66",
-        "frontend": "#33FF33",
-        "frontend": "#B3B3FF",
-        "frontend": "#6666FF",
-        "frontend": "#3333FF",
-        "frontend": "#FFE0B3",
-        "frontend": "#FF9966",
-        "frontend": "#FF6600",
-    }
-
-    if category is not None:
-        category = category.lower()
-    else:
-        category = ""
-
-    return categorias.get(category, "#c8e721")
 
 
 def generate_graph_html():

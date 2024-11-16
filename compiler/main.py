@@ -38,7 +38,7 @@ def process_command(command, graph_view):
         if identifier:
             return graph_view.delete_vertice(identifier)
         else:
-            return "Erro: Comando incompleto. Use: delete (id/nome)"
+            return "Erro: Comando incompleto. Use: del (id/nome)"
 
     elif cmd == "del_aresta":
         if len(tokens) < 3:
