@@ -20,7 +20,7 @@ class Terminal(QWidget):
         self.terminal = QTextEdit(self)
         self.terminal.setReadOnly(True)
         self.terminal.setLineWrapMode(QTextEdit.LineWrapMode.NoWrap)
-        self.terminal.setMinimumWidth(600)
+        self.terminal.setMinimumWidth(200)
 
         self.terminal.setStyleSheet(
             """
@@ -68,7 +68,11 @@ class Terminal(QWidget):
         self.input.clear()
 
         graph_view = GraphScene()
-        response = graph.process_command(command, graph_view)
+
+        if command == "cls":
+            self.terminal.clear()
+        else:
+            response = graph.process_command(command, graph_view)
         print(response)
 
         if command == "list":

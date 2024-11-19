@@ -16,8 +16,21 @@ def get_graph_db():
 def create_graph_complete(raw_data):
     Graph = nx.MultiGraph()
 
-    for data in raw_data:
+    # Dicionário para armazenar o número de conexões de cada vértice
+    connection_counts = {}
 
+    # Primeiro loop: contar conexões de cada vértice
+    for data in raw_data:
+        vertice_name = data[0]
+        connected_to = data[3]
+
+        # Incrementa a contagem para o vértice atual
+        if vertice_name not in connection_counts:
+            connection_counts[vertice_name] = 0
+        connection_counts[vertice_name] += 1
+
+    # Segundo loop: adicionar vértices e arestas com pesos ajustados
+    for data in raw_data:
         vertice = Vertice(
             name=data[0],
             category=data[1],
@@ -25,24 +38,44 @@ def create_graph_complete(raw_data):
             connections=data[3],
         )
 
+        # Adicionar o nó ao grafo
         Graph.add_node(
             node_for_adding=vertice.name,
             category=vertice.category,
             group=vertice.category,
             size=20,
             title=(
-                vertice.category
+                f"Categoria: {vertice.category.replace('_', ' ')}\n Valor: {vertice.value}"
                 if (vertice.category is not None or vertice.category)
-                else vertice.name
+                else f"Valor: {vertice.value}"
             ),
         )
 
+        # Adicionar a aresta se houver uma conexão
         if vertice.connections is not None:
+            connected_vertice_value = int(
+                [
+                    item[2]
+                    for item in raw_data
+                    if item[0] == vertice.connections and item[3] == vertice.name
+                ][0]
+            )
+
+            count_a = connection_counts[vertice.name]
+            count_b = connection_counts[vertice.connections]
+
+            edge_weight = (vertice.value / count_a) + (
+                connected_vertice_value / count_b
+            )
+            edge_width = edge_weight / 10
+
             Graph.add_edge(
                 u_for_edge=vertice.name,
                 v_for_edge=vertice.connections,
-                weight=(vertice.value / 10) + 5,
+                weight=edge_weight,
                 color="rgba(208,204,202,0.8)",
+                width=edge_width,
+                title=f"Custo: R${edge_weight:.2f}",
             )
     return Graph
 
@@ -52,6 +85,9 @@ def generate_graph_html():
     print(graph_db)
 
     Graph = create_graph_complete(graph_db)
+
+    communities = nx.algorithms.community.greedy_modularity_communities(Graph)
+    print(communities)
 
     positions = nx.spring_layout(Graph, seed=42)
 
@@ -79,7 +115,9 @@ def generate_graph_html():
             edge[0],
             edge[1],
             weight=edge[2].get("weight"),
+            width=edge[2].get("width"),
             color=edge[2].get("color"),
+            title=edge[2].get("title"),
         )
     # net.from_nx(Graph)
 
