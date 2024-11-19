@@ -7,8 +7,6 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from compiler.main import *
 from compiler.graph_scene import *
 
-import graph
-
 
 class Terminal(QWidget):
 
@@ -71,12 +69,13 @@ class Terminal(QWidget):
 
         if command == "cls":
             self.terminal.clear()
-        else:
-            response = graph.process_command(command, graph_view)
-        print(response)
-
-        if command == "list":
             response = ""
+
+        elif command == "list":
+            response = ""
+
+        else:
+            response = process_command(command, graph_view)
 
         self.terminal.append(response)
 

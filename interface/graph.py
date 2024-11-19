@@ -7,6 +7,8 @@ from compiler.main import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from models.vertice import *
 
+format_graph = "regular"
+
 
 def get_graph_db():
     graph_view = GraphScene()
@@ -15,14 +17,12 @@ def get_graph_db():
 
 def create_graph_complete(raw_data):
     Graph = nx.MultiGraph()
-
     # Dicionário para armazenar o número de conexões de cada vértice
     connection_counts = {}
 
     # Primeiro loop: contar conexões de cada vértice
     for data in raw_data:
         vertice_name = data[0]
-        connected_to = data[3]
 
         # Incrementa a contagem para o vértice atual
         if vertice_name not in connection_counts:
@@ -80,14 +80,23 @@ def create_graph_complete(raw_data):
     return Graph
 
 
-def generate_graph_html():
-    graph_db = get_graph_db()
-    print(graph_db)
+def create_graph_communities(raw_data):
+    return
 
+
+def generate_graph_html():
+
+    graph_db = get_graph_db()
     Graph = create_graph_complete(graph_db)
 
+    # if format == "communities":
+    #     return
+    # elif format == "categories":
+    #     return
+    # else:
+    #     return
+
     communities = nx.algorithms.community.greedy_modularity_communities(Graph)
-    print(communities)
 
     positions = nx.spring_layout(Graph, seed=42)
 
