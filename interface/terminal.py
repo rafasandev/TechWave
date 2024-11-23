@@ -7,10 +7,13 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from compiler.main import *
 from compiler.graph_scene import *
 
+import graph
+
 
 class Terminal(QWidget):
 
     graph_updated = pyqtSignal()
+    format_graph = "regular"
 
     def __init__(self):
         super().__init__()
@@ -73,6 +76,14 @@ class Terminal(QWidget):
 
         elif command == "list":
             response = ""
+
+        elif command == "get_regular":
+            response = "Listando grafo regular"
+            self.format_graph = "regular"
+
+        elif command == "get_comunidades":
+            response = f"Listando partições: \n{graph.get_communities_costs()}"
+            self.format_graph = "communities"
 
         else:
             response = process_command(command, graph_view)

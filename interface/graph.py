@@ -7,13 +7,6 @@ from compiler.main import *
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from models.vertice import *
 
-format_graph = "regular"
-
-
-def get_graph_db():
-    graph_view = GraphScene()
-    return process_command("list", graph_view)
-
 
 def create_graph_complete(raw_data):
     Graph = nx.MultiGraph()
@@ -80,23 +73,97 @@ def create_graph_complete(raw_data):
     return Graph
 
 
-def create_graph_communities(raw_data):
-    return
+def get_graph_db():
+    graph_view = GraphScene()
+    graph_db = process_command("list", graph_view)
+    return create_graph_complete(graph_db)
 
 
-def generate_graph_html():
+colors = [
+    "#FF5733",
+    "#33FF57",
+    "#3357FF",
+    "#FF33A1",
+    "#A133FF",
+    "#FF9C33",
+    "#33FFF3",
+    "#F3FF33",
+    "#FF3333",
+]
 
-    graph_db = get_graph_db()
-    Graph = create_graph_complete(graph_db)
 
-    # if format == "communities":
-    #     return
-    # elif format == "categories":
-    #     return
-    # else:
-    #     return
+def generate_community_graph():
+    Graph = get_graph_db()
 
     communities = nx.algorithms.community.greedy_modularity_communities(Graph)
+
+    print(communities)
+
+    net = Network(
+        notebook=False,
+        cdn_resources="remote",
+        bgcolor="#272E25",
+        height="101vh",
+        font_color="#ffffff",
+    )
+
+    community_mapping = {}
+    for group_id, community in enumerate(communities):
+        for node in community:
+            community_mapping[node] = group_id
+
+    positions = nx.spring_layout(Graph, seed=42)
+
+    for node, pos in positions.items():
+        x, y = pos[0] * 1000, pos[1] * 1000
+        net.add_node(
+            node,
+            x=x,
+            y=y,
+            title=Graph.nodes[node].get("title"),
+            group=community_mapping[node],
+            size=10,
+        )
+
+    for edge in Graph.edges(data=True):
+        net.add_edge(
+            edge[0],
+            edge[1],
+            weight=edge[2].get("weight"),
+            width=edge[2].get("width"),
+            color=edge[2].get("color"),
+            title=edge[2].get("title"),
+        )
+
+    return net.generate_html()
+
+
+def get_communities_costs():
+    Graph = get_graph_db()
+
+    communities = nx.algorithms.community.greedy_modularity_communities(Graph)
+    result_lines = []
+
+    for index, community in enumerate(communities):
+        community_edges = [
+            (u, v, data)
+            for u, v, data in Graph.edges(data=True)
+            if u in community and v in community
+        ]
+
+        # Calcular o custo total
+        total_cost = sum(data.get("weight", 1) for _, _, data in community_edges)
+
+        # Adicionar a linha formatada
+        result_lines.append(f"Custo total: {round(total_cost, 2)}")
+
+    # Juntar as linhas com quebra de linha
+    return "\n".join(result_lines)
+
+
+def generate_regular_graph():
+
+    Graph = get_graph_db()
 
     positions = nx.spring_layout(Graph, seed=42)
 
@@ -115,8 +182,8 @@ def generate_graph_html():
             x=x,
             y=y,
             title=Graph.nodes[node].get("title"),
-            group=Graph.nodes[node].get("group"),
-            size=Graph.nodes[node].get("size"),
+            group=Graph.nodes[node].get("category"),
+            size=Graph.nodes[node].get("value"),
         )
 
     for edge in Graph.edges(data=True):

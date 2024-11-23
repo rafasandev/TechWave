@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
 
         graph.get_graph_db()
 
-        self.graph_html = graph.generate_graph_html()
+        self.graph_html = graph.generate_regular_graph()
         self.graph_html = self.graph_html.replace(
             "<body>", "<body style='margin: -10px -2px 15px -2px; overflow: hidden;'>"
         )
@@ -66,7 +66,13 @@ class MainWindow(QMainWindow):
 
     def update_graph(self):
 
-        self.graph_html = graph.generate_graph_html()
+        format = self.terminal_widget.format_graph
+
+        if format == "regular":
+            self.graph_html = graph.generate_regular_graph()
+        elif format == "communities":
+            self.graph_html = graph.generate_community_graph()
+
         self.graph_html = self.graph_html.replace(
             "<body>", "<body style='margin: -10px -2px 15px -2px; overflow: hidden;'>"
         )
