@@ -1,0 +1,24 @@
+add Energia Eletricidade 300  
+add Água Essencial 120  
+add Internet Comunicação 150  
+add Geladeira Eletrodoméstico 50  
+add Máquina_de_Lavar Eletrodoméstico 30  
+add Lâmpadas Iluminação 20  
+add Ar_Condicionado Climatização 100  
+add Manutenção_da_Casa Geral 200  
+add Jardim Decoração 80  
+add TV Comunicação 50  
+--------------------------------------
+connect Energia Geladeira  
+connect Energia Máquina_de_Lavar  
+connect Energia Lâmpadas  
+connect Energia Ar_Condicionado  
+connect Água Máquina_de_Lavar  
+connect Água Jardim  
+connect Internet TV  
+connect Internet Geladeira  
+connect Manutenção_da_Casa Jardim  
+connect Manutenção_da_Casa Lâmpadas  
+connect Manutenção_da_Casa Ar_Condicionado  
+connect TV Internet  
+connect Jardim Água  

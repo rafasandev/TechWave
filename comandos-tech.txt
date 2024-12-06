@@ -1,0 +1,62 @@
+add Angular Frontend 30  
+add React Frontend 25  
+add Vue Frontend 20  
+add Bootstrap Frontend 15  
+add TailwindCSS Frontend 10  
+add Django Backend 35  
+add Flask Backend 30  
+add ASP.NET Backend 40  
+add Spring Backend 38  
+add Node.js Backend 28  
+add MongoDB Database 50  
+add MySQL Database 45  
+add PostgreSQL Database 47  
+add Redis Cache 15  
+add Elasticsearch Search 60  
+add AWS Cloud 80  
+add Azure Cloud 75  
+add Firebase Cloud 50  
+add Jenkins CI/CD 40  
+add GitHub Actions CI/CD 20  
+add Docker DevOps 35  
+add Kubernetes DevOps 60  
+add Nginx Infrastructure 25  
+add Apache Infrastructure 20  
+add RabbitMQ Messaging 30  
+add Kafka Messaging 50  
+add Prometheus Monitoring 25  
+add Grafana Monitoring 30  
+add Selenium Testing 20  
+add Cypress Testing 18  
+------------------------
+connect Angular Node.js  
+connect React Firebase  
+connect Vue MongoDB  
+connect Bootstrap Django  
+connect TailwindCSS Flask  
+connect Django PostgreSQL  
+connect Flask MySQL  
+connect ASP.NET MongoDB  
+connect Spring Redis  
+connect Node.js MongoDB  
+connect Redis Elasticsearch  
+connect AWS Jenkins  
+connect Azure GitHub Actions  
+connect Firebase Docker  
+connect Docker Kubernetes  
+connect Nginx AWS  
+connect Apache Azure  
+connect RabbitMQ Kafka  
+connect Prometheus Grafana  
+connect Selenium Angular  
+connect Cypress React  
+connect Vue Docker  
+connect MongoDB AWS  
+connect PostgreSQL Firebase  
+connect MySQL Azure  
+connect Kubernetes Nginx  
+connect Jenkins GitHub Actions  
+connect Elasticsearch Prometheus  
+connect RabbitMQ Nginx  
+connect Kafka Grafana  
+connect Docker Prometheus  
